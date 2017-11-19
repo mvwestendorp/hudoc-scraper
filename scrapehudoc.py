@@ -11,7 +11,7 @@ import re
 import sys
 import scrapecase as sc
 import concurrent.futures
-from multiprocessing.dummy import Pool as ThreadPool
+from multiprocessing.dummy import Pool
 
 
 connection = MySQLdb.connect(   host = "localhost",
@@ -19,6 +19,7 @@ connection = MySQLdb.connect(   host = "localhost",
                                 passwd = "phpsuperw8",
                                 db = "HUDOC")
 cursor = connection.cursor()
+#TODO change sql to get only missing items
 sql = """SELECT `Application Number` FROM `judgements` WHERE 1"""
 cursor.execute(sql)
 appnos = cursor.fetchall()
@@ -28,12 +29,16 @@ connection.close()
 appnos = [appno for element in appnos for appno in element]
 appnos = list(set(appnos)) #undouble
 nothreads = 1
-if int(sys.argv[1]):
+if len(sys.argv) >= 2:
     nothreads = int(sys.argv[1])
-chunks = [appnos[x:x+round(len(appnos)/nothreads)] for x in range(0, len(appnos), round(len(appnos)/nothreads))]
 
 #sc.scrapecases(appnos)
 #spawn threads and scrape
-executor = concurrent.futures.ProcessPoolExecutor(nothreads)
-futures = [executor.submit(sc.scrapecases, chunk) for chunk in chunks]
-concurrent.futures.wait(futures)
+#executor = concurrent.futures.ProcessPoolExecutor(nothreads)
+#futures = [executor.submit(sc.scrapecases, chunk) for chunk in chunks]
+#concurrent.futures.wait(futures)
+
+with Pool(processes=nothreads) as pool:
+    pool.map(sc.scrapecases, [appnos[x:x+round(len(appnos)/nothreads)] for x in range(0, len(appnos), round(len(appnos)/nothreads))]) 
+    pool.close()
+    pool.join()
