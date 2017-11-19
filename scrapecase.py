@@ -12,8 +12,8 @@ from bs4 import BeautifulSoup
 import os
 import string
 
-#todo: get applications numbers from csv files or sql database
-#Leave csv collection in php but do further scraping and parsing in python
+#TODO check why some webdrivers fail.
+
 def scrapecases(appnos):
     options= Options()    
     options.add_argument('-headless')

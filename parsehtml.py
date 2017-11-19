@@ -10,7 +10,7 @@ from os import listdir
 from os.path import isfile, join
 import time
 import cProfile
-
+#TODO create list with parsed case numbers so not checking all files.
 def parsecase(appnos):
     connection = MySQLdb.connect(   host = "localhost", user = "root", passwd = "phpsuperw8", db = "HUDOC")
     cursor = connection.cursor()
